@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "semantic-ui": "^2.4.2"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-print": "^5.0.0"
+  },
+  "engines" : {
+    "node": "11.15.0",
+    "npm": "6.7.0"
+  },
+  "scripts": {
+    "npm start": "gulp build"
+  }
+}
