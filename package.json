@@ -1,6 +1,29 @@
 {
-  "engines" : {
+  "engines": {
     "node": "11.15.0",
     "npm": "6.7.0"
-  }
+  },
+  "name": "texttestpp",
+  "description": "TextTest++ for text entry experiments (using the T-seq model) and Throughput calculation",
+  "version": "1.0.0",
+  "main": "start.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "gulp": "^3.9.1",
+    "gulp-print": "^5.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/womackj1/SilentSpeller.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/womackj1/SilentSpeller/issues"
+  },
+  "homepage": "https://github.com/womackj1/SilentSpeller#readme"
 }
