@@ -10,11 +10,16 @@
   "dependencies": {
     "express": "^4.17.1",
     "gulp": "^3.9.1",
+    "gulp-print": "^5.0.0",
+    "semantic-ui": "^2.4.2"
+
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
     "gulp-print": "^5.0.0"
   },
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
   },
   "repository": {
     "type": "git",
