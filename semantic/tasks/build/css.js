@@ -18,7 +18,7 @@ var
   less         = require('gulp-less'),
   minifyCSS    = require('gulp-clean-css'),
   plumber      = require('gulp-plumber'),
-  print        = require('gulp-print'),
+  print        = require('gulp-print').default,
   rename       = require('gulp-rename'),
   replace      = require('gulp-replace'),
   runSequence  = require('run-sequence'),
@@ -39,9 +39,6 @@ var
   log          = tasks.log,
   settings     = tasks.settings
 ;
-
-var print = require('gulp-print').default;
-
 
 // add internal tasks (concat release)
 require('../collections/internal')(gulp);
@@ -99,7 +96,7 @@ module.exports = function(callback) {
   ;
 
   // compressed component css
-  compressedStream = stream
+  compressedStream
     .pipe(plumber())
     .pipe(clone())
     .pipe(replace(assets.source, assets.compressed))

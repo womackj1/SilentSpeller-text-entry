@@ -30,9 +30,6 @@ var
   watchRTL     = require('./tasks/rtl/watch')
 ;
 
-var print = require('gulp-print');
-// usage
-print.default()
 
 /*******************************
              Tasks

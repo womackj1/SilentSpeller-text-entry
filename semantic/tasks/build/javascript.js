@@ -14,7 +14,7 @@ var
   flatten      = require('gulp-flatten'),
   gulpif       = require('gulp-if'),
   plumber      = require('gulp-plumber'),
-  print        = require('gulp-print'),
+  print        = require('gulp-print').default,
   rename       = require('gulp-rename'),
   replace      = require('gulp-replace'),
   uglify       = require('gulp-uglify'),
@@ -36,8 +36,6 @@ var
   settings     = tasks.settings
 ;
 
-var print = require('gulp-print').default;
-// usage
 // add internal tasks (concat release)
 require('../collections/internal')(gulp);
 
