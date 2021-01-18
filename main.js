@@ -31,6 +31,12 @@ var Started = false;
 //vars related to dictionary
 var all_words = [];
 
+//vars related to statistics
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
+var wpms = [];
+var ters = [];
+
+
 $('.ui.accordion')
   .accordion()
 ;
@@ -50,7 +56,6 @@ $.ajax({
     url:'dictionary.txt',
     success: function (data){
         all_words = data.split('\n');
-        console.log(all_words);
         //    shuffle(allphrases);
     }
 });
@@ -228,6 +233,22 @@ $("#Next").click(function() {
     ItemJson["Transcribed"] = tsequence[tsequence.length - 1];
     let ts = ItemJson["Transcribe"]
     ItemJson["Time"] = ts[ts.length-1].TimeStamp - ts[0].TimeStamp;
+    //Update Statisticss
+    let time = (ts[ts.length-1].TimeStamp - ts[0].TimeStamp) / 1000, fix_time = 0, delete_time = 0
+    let Tlen = ts[ts.length-1].Text.length
+    let WPM = (Tlen-ts[0].Text.length) / (time/12)
+    wpms.push(WPM)
+    let avg_WPM = wpms.reduce(reducer)/wpms.length
+
+    ters.push(parseFloat(ItemJson["TER"]))
+    let avg_TER = ters.reduce(reducer)/ters.length
+    console.log(ters)
+    console.log(ters.length)
+    console.log(ters.reduce(reducer))
+    console.log(avg_TER)
+    $('#Statistics').html("WPM:" + parseInt(WPM, 10) + ", avg.WPM:" + parseInt(avg_WPM, 10) + ", TER:" + Math.round(parseFloat(ItemJson["TER"]) * 100) / 100 + ", avg.TER:"+ Math.round(avg_TER * 100) / 100);
+
+
     AllJson.push(JSON.parse(JSON.stringify(ItemJson)));
     ItemJson = { Transcribe: [], Action: [] };
     

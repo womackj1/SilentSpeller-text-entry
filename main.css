@@ -23,7 +23,7 @@
     font-size: 0.8em;
 }
 
-#Present {
+#Present, #Statistics {
     border-width: 0px;
 /*    font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;*/
     font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
