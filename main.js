@@ -281,12 +281,14 @@ $("#Transcribe").keypress(function(){
                 if (prev_word.localeCompare("<start>") == 0) {
                     var curr_probability = distance_probs_norm[i] ;
                 } else {
-                    var curr_probability = transition_probs_norm[i] + 5*distance_probs_norm[i];
+                    var curr_probability = transition_probs_norm[i] + 10*distance_probs_norm[i];
                 }
                 // console.log(transition_probs_norm[i])
                 if (curr_probability > max_probability) {
                     max_probability = curr_probability;
                     closest_word = words[i];
+                    console.log(transition_probs_norm[i])
+                    console.log(5*distance_probs_norm[i])
                     console.log(closest_word)
                 }
             }
