@@ -36,6 +36,34 @@ const reducer = (accumulator, currentValue) => accumulator + currentValue;
 var wpms = [];
 var ters = [];
 
+var csv_txt = "";
+fetch('./bigram_weights.csv')
+    .then(response => response.text())
+    .then(text => console.log(text));
+
+
+
+var csv_data;
+var weights;
+$.ajax({
+    type: "GET",
+    url: "./bigram_weights.csv",
+    dataType: "text",
+    success: function(response)
+    {
+        csv_data = $.csv.toArrays(response);
+        console.log(csv_data);
+        words = csv_data.shift();
+        words.shift();
+        console.log(words);
+        weights = csv_data.map(function(val) {
+            return val.slice(1);
+        });
+        console.log(weights);
+    }
+});
+
+// console.log(data);
 
 $('.ui.accordion')
   .accordion()
@@ -202,17 +230,68 @@ $("#Transcribe").keypress(function(){
     if (key == 32){
         var curr_transcription = $('#Transcribe').val();
         var transcription_words = curr_transcription.split( ' ' );
+        transcription_words.unshift("<start>");
         var curr_word = transcription_words.slice(-1)[0];
-        var min_distance = 100000;
+
+        //Uni-gram
+        // var min_distance = 100000;
+        // var closest_word = "";
+        // var word;
+        // for (word in all_words) {
+        //     var word_distance = levenshtein(all_words[word], curr_word);
+        //     if (word_distance < min_distance) {
+        //         min_distance = word_distance;
+        //         closest_word = all_words[word];
+        //     }
+        // }
+
+
+        //Bi-gram
+        var candidate_list;
         var closest_word = "";
-        var word;
-        for (word in all_words) {
-            var word_distance = levenshtein(all_words[word], curr_word);
-            if (word_distance < min_distance) {
-                min_distance = word_distance;
-                closest_word = all_words[word];
+        var prev_word = transcription_words.slice(-2)[0];
+        if (all_words.includes(curr_word)) {
+            closest_word = curr_word;
+        } else {
+            var distance_probs = [];
+            words.forEach(word => distance_probs.push(1/levenshtein(word, curr_word)));
+
+
+            // calculate probabilities based on string distance
+            var distance_probs_norm = [];
+            var norm_constant = distance_probs.reduce(reducer);
+            distance_probs.forEach(distance_prob => distance_probs_norm.push(distance_prob/norm_constant));
+
+
+            // select transition probability
+            var row = words.indexOf(prev_word);
+            var transition_probs = weights[row].map(function(str) {
+                str = Number(str);
+                return str;
+            });
+            // var transition_probs = weights[row];
+            var transition_probs_norm = [];
+            var norm_constant = transition_probs.reduce(reducer);
+            transition_probs.forEach(transition_prob => transition_probs_norm.push(transition_prob/norm_constant));
+
+            console.log(transition_probs);
+            console.log(transition_probs_norm);
+
+            var max_probability = 0;
+            for(var i = 0, length = distance_probs_norm.length; i < length; i++){
+                var curr_probability = distance_probs_norm[i];
+
+                // var curr_probability = transition_probs_norm[i] * distance_probs_norm[i];
+                if (curr_probability > max_probability) {
+                    max_probability = curr_probability;
+                    closest_word = words[i];
+                }
             }
         }
+        // candidate_list = laplacian_bigram(raw_results[ind], prev_word, weight_matrix, 0.5, False);
+        // closest_word = candidate_list[0];
+
+
         var fixed_transcription = curr_transcription.substring(0, curr_transcription.length - curr_word.length) + closest_word;
         $('#Transcribe').val(fixed_transcription);
     }

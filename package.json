@@ -15,7 +15,8 @@
   },
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-print": "^5.0.0"
+    "gulp-print": "^5.0.0",
+    "jquery-csv": "^1.0.11"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
