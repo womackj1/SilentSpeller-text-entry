@@ -262,7 +262,7 @@ $("#Transcribe").keypress(function(){
             var norm_constant = distance_probs.reduce(reducer);
             distance_probs.forEach(distance_prob => distance_probs_norm.push(distance_prob/norm_constant));
 
-
+            console.log(prev_word);
             // select transition probability
             var row = words.indexOf(prev_word);
             var transition_probs = weights[row].map(function(str) {
@@ -274,17 +274,20 @@ $("#Transcribe").keypress(function(){
             var norm_constant = transition_probs.reduce(reducer);
             transition_probs.forEach(transition_prob => transition_probs_norm.push(transition_prob/norm_constant));
 
-            console.log(transition_probs);
-            console.log(transition_probs_norm);
-
             var max_probability = 0;
             for(var i = 0, length = distance_probs_norm.length; i < length; i++){
-                var curr_probability = distance_probs_norm[i];
-
-                // var curr_probability = transition_probs_norm[i] * distance_probs_norm[i];
+                // var curr_probability = distance_probs_norm[i] ;
+                // var curr_probability = transition_probs_norm[i] ;
+                if (prev_word.localeCompare("<start>") == 0) {
+                    var curr_probability = distance_probs_norm[i] ;
+                } else {
+                    var curr_probability = transition_probs_norm[i] + 5*distance_probs_norm[i];
+                }
+                // console.log(transition_probs_norm[i])
                 if (curr_probability > max_probability) {
                     max_probability = curr_probability;
                     closest_word = words[i];
+                    console.log(closest_word)
                 }
             }
         }
