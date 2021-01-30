@@ -38,8 +38,7 @@ var ters = [];
 
 var csv_txt = "";
 fetch('./bigram_weights.csv')
-    .then(response => response.text())
-    .then(text => console.log(text));
+    .then(response => response.text());
 
 
 
@@ -52,14 +51,11 @@ $.ajax({
     success: function(response)
     {
         csv_data = $.csv.toArrays(response);
-        console.log(csv_data);
         words = csv_data.shift();
         words.shift();
-        console.log(words);
         weights = csv_data.map(function(val) {
             return val.slice(1);
         });
-        console.log(weights);
     }
 });
 
@@ -274,22 +270,23 @@ $("#Transcribe").keypress(function(){
             var norm_constant = transition_probs.reduce(reducer);
             transition_probs.forEach(transition_prob => transition_probs_norm.push(transition_prob/norm_constant));
 
+
             var max_probability = 0;
             for(var i = 0, length = distance_probs_norm.length; i < length; i++){
                 // var curr_probability = distance_probs_norm[i] ;
                 // var curr_probability = transition_probs_norm[i] ;
                 if (prev_word.localeCompare("<start>") == 0) {
-                    var curr_probability = distance_probs_norm[i] ;
+                    var curr_probability = distance_probs_norm[i];
                 } else {
-                    var curr_probability = transition_probs_norm[i] + 10*distance_probs_norm[i];
+                    var curr_probability = transition_probs_norm[i] * distance_probs_norm[i];
                 }
                 // console.log(transition_probs_norm[i])
                 if (curr_probability > max_probability) {
                     max_probability = curr_probability;
                     closest_word = words[i];
                     console.log(transition_probs_norm[i])
-                    console.log(5*distance_probs_norm[i])
-                    console.log(closest_word)
+                    console.log(distance_probs_norm[i])
+                    console.log(words[i])
                 }
             }
         }
@@ -304,6 +301,13 @@ $("#Transcribe").keypress(function(){
 })
 
 $("#Next").click(function() {
+    //Account for users typing space at the end for n-gram or autocorrect
+    var final_transcription = tsequence[tsequence.length - 1];
+    if (final_transcription[final_transcription.length - 1] == " ") {
+        console.log(final_transcription);
+    }
+    tsequence.pop();
+
     if ( !$("#Transcribe").val() ) return;
     res = getGuessResult(PresentString, tsequence[tsequence.length - 1]);
     ItemLog = ("<p>Change Result: INF " + res[0] + " IF " + IF + " C " + res[1] + "</p>" + ItemLog);
@@ -326,10 +330,7 @@ $("#Next").click(function() {
 
     ters.push(parseFloat(ItemJson["TER"]))
     let avg_TER = ters.reduce(reducer)/ters.length
-    console.log(ters)
-    console.log(ters.length)
-    console.log(ters.reduce(reducer))
-    console.log(avg_TER)
+
     $('#Statistics').html("WPM:" + parseInt(WPM, 10) + ", avg.WPM:" + parseInt(avg_WPM, 10) + ", TER:" + Math.round(parseFloat(ItemJson["TER"]) * 100) / 100 + ", avg.TER:"+ Math.round(avg_TER * 100) / 100);
 
 
