@@ -217,6 +217,7 @@ $("#Transcribe").keypress(function(){
     var key = window.event.keyCode;
     if (key == 13){ // enter pressed
         if ($("#EnterNext").prop("checked")){
+            $("#Transcribe").bind;
             $("#Next").click();
             return false;
         }
@@ -250,8 +251,8 @@ $("#Transcribe").keypress(function(){
             closest_word = curr_word;
         } else {
             var distance_probs = [];
-            words.forEach(word => distance_probs.push(1/levenshtein(word, curr_word)));
-
+            words.forEach(word => distance_probs.push(Math.pow(string_similarity(word, curr_word),2)));
+            // words.forEach(word => distance_probs.push(levenshtein(word, curr_word)));
 
             // calculate probabilities based on string distance
             var distance_probs_norm = [];
@@ -277,15 +278,15 @@ $("#Transcribe").keypress(function(){
                 if (prev_word.localeCompare("<start>") == 0) {
                     var curr_probability = distance_probs_norm[i];
                 } else {
-                    var curr_probability = transition_probs_norm[i] * distance_probs_norm[i];
+                    var curr_probability = transition_probs_norm[i] * distance_probs[i];
                 }
-                // console.log(transition_probs_norm[i])
+
                 if (curr_probability > max_probability) {
+                    // console.log("Transition: " + transition_probs_norm[i])
+                    // console.log("Distance: " + distance_probs_norm[i])
+                    // console.log(words[i])
                     max_probability = curr_probability;
                     closest_word = words[i];
-                    // console.log(transition_probs_norm[i])
-                    // console.log(distance_probs_norm[i])
-                    // console.log(words[i])
                 }
             }
         }
@@ -303,7 +304,7 @@ $("#Next").click(function() {
     //Account for users typing space at the end for n-gram or autocorrect
     var final_transcription = tsequence[tsequence.length - 1];
     if (final_transcription[final_transcription.length - 1] == " ") {
-        tsequence.pop();
+        tsequence[tsequence.length - 1] = final_transcription.slice(0,-1);
     }
 
     if ( !$("#Transcribe").val() ) return;
@@ -314,7 +315,7 @@ $("#Next").click(function() {
     ItemJson["Present"] = PresentString;
     ItemJson["IF"] = IF, ItemJson["INF"] = res[0], ItemJson["C"] = res[1];
     ItemJson["CER"] = (IF/(IF+res[1]+res[0])).toFixed(3) 
-    ItemJson["UER"] = (res[0]/(IF+res[1]+res[0])).toFixed(3) 
+    ItemJson["UER"] = (res[0]/(IF+res[1]+res[0])).toFixed(3)
     ItemJson["TER"] = ((IF+res[0])/(IF+res[1]+res[0])).toFixed(3)
     ItemJson["Transcribed"] = tsequence[tsequence.length - 1];
     let ts = ItemJson["Transcribe"]
@@ -485,6 +486,18 @@ function compareNlog(r, t1, t2) {
         reslog += ('<p>' + r[0] + ' from ' + r[1] + ' to ' + r[2] + '&#9;<span class="blue">' + t2.substr(r[1], r[2]) + '</span></p>');
     }
     return reslog;
+}
+
+const string_similarity = (a, b) => {
+    //B is transcription
+    var i;
+    var similarity = 0;
+    for (i = 0; i < b.length; i++) {
+        if (a[i] == b[i]) {
+            similarity = similarity + 1;
+        }
+    }
+    return similarity
 }
 
 const levenshtein = (a, b) => {
