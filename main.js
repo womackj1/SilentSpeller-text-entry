@@ -258,7 +258,6 @@ $("#Transcribe").keypress(function(){
             var norm_constant = distance_probs.reduce(reducer);
             distance_probs.forEach(distance_prob => distance_probs_norm.push(distance_prob/norm_constant));
 
-            console.log(prev_word);
             // select transition probability
             var row = words.indexOf(prev_word);
             var transition_probs = weights[row].map(function(str) {
@@ -284,9 +283,9 @@ $("#Transcribe").keypress(function(){
                 if (curr_probability > max_probability) {
                     max_probability = curr_probability;
                     closest_word = words[i];
-                    console.log(transition_probs_norm[i])
-                    console.log(distance_probs_norm[i])
-                    console.log(words[i])
+                    // console.log(transition_probs_norm[i])
+                    // console.log(distance_probs_norm[i])
+                    // console.log(words[i])
                 }
             }
         }
@@ -304,9 +303,8 @@ $("#Next").click(function() {
     //Account for users typing space at the end for n-gram or autocorrect
     var final_transcription = tsequence[tsequence.length - 1];
     if (final_transcription[final_transcription.length - 1] == " ") {
-        console.log(final_transcription);
+        tsequence.pop();
     }
-    tsequence.pop();
 
     if ( !$("#Transcribe").val() ) return;
     res = getGuessResult(PresentString, tsequence[tsequence.length - 1]);
