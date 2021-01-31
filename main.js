@@ -30,6 +30,7 @@ var Started = false;
 
 //vars related to dictionary
 var all_words = [];
+var unchanged_character_count = 0;
 
 //vars related to statistics
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
@@ -219,6 +220,7 @@ $("#Transcribe").keypress(function(){
         if ($("#EnterNext").prop("checked")){
             $("#Transcribe").bind;
             $("#Next").click();
+            unchanged_character_count = 0;
             return false;
         }
     }
@@ -252,7 +254,7 @@ $("#Transcribe").keypress(function(){
         } else {
             var distance_probs = [];
             words.forEach(word => distance_probs.push(Math.pow(string_similarity(word, curr_word),2)));
-            // words.forEach(word => distance_probs.push(levenshtein(word, curr_word)));
+            // words.forEach(word => distance_probs.push(Math.pow(levenshtein(word.slice(0,curr_word.length), curr_word),2)));
 
             // calculate probabilities based on string distance
             var distance_probs_norm = [];
@@ -294,6 +296,7 @@ $("#Transcribe").keypress(function(){
         // closest_word = candidate_list[0];
 
 
+
         var fixed_transcription = curr_transcription.substring(0, curr_transcription.length - curr_word.length) + closest_word;
         $('#Transcribe').val(fixed_transcription);
     }
@@ -308,7 +311,10 @@ $("#Next").click(function() {
     }
 
     if ( !$("#Transcribe").val() ) return;
+    // console.log(PresentString);
+    // console.log(tsequence[tsequence.length - 1])
     res = getGuessResult(PresentString, tsequence[tsequence.length - 1]);
+
     ItemLog = ("<p>Change Result: INF " + res[0] + " IF " + IF + " C " + res[1] + "</p>" + ItemLog);
     
     ItemJson["Trial"] = phrasecount;
@@ -317,6 +323,10 @@ $("#Next").click(function() {
     ItemJson["CER"] = (IF/(IF+res[1]+res[0])).toFixed(3) 
     ItemJson["UER"] = (res[0]/(IF+res[1]+res[0])).toFixed(3)
     ItemJson["TER"] = ((IF+res[0])/(IF+res[1]+res[0])).toFixed(3)
+
+    let autocorrect_ter = ((IF-unchanged_character_count+res[0])/(IF-unchanged_character_count+res[1]+res[0])).toFixed(3)
+    // console.log(IF)
+    // console.log(unchanged_character_count)
     ItemJson["Transcribed"] = tsequence[tsequence.length - 1];
     let ts = ItemJson["Transcribe"]
     ItemJson["Time"] = ts[ts.length-1].TimeStamp - ts[0].TimeStamp;
@@ -326,11 +336,13 @@ $("#Next").click(function() {
     let WPM = (Tlen-ts[0].Text.length) / (time/12)
     wpms.push(WPM)
     let avg_WPM = wpms.reduce(reducer)/wpms.length
-
-    ters.push(parseFloat(ItemJson["TER"]))
+    ters.push(parseFloat(autocorrect_ter))
     let avg_TER = ters.reduce(reducer)/ters.length
 
-    $('#Statistics').html("WPM:" + parseInt(WPM, 10) + ", avg.WPM:" + parseInt(avg_WPM, 10) + ", TER:" + Math.round(parseFloat(ItemJson["TER"]) * 100) / 100 + ", avg.TER:"+ Math.round(avg_TER * 100) / 100);
+    $('#Statistics').html("WPM:" + parseInt(WPM, 10) +
+        ", avg.WPM:" + parseInt(avg_WPM, 10) +
+        ", TER:" + Math.round(parseFloat(autocorrect_ter) * 100) / 100 +
+        ", avg.TER:"+ Math.round(avg_TER * 100) / 100);
 
 
     AllJson.push(JSON.parse(JSON.stringify(ItemJson)));
@@ -408,10 +420,10 @@ function getCursorPosition(element) {
 //INFER-ACTION implementation
 function guessChangeInfo(t1, t2, res) {
     if (t1.length == 0) {
-        //console.log('insert from 0');
+        // console.log('insert from 0');
         return ['insert', 0, t2.length - t1.length];
     } else if (t2.length == 0) {
-        //console.log('delete from tail');
+        // console.log('delete from tail');
         IF += t1.length;
         return ['delete', 0, t1.length];
     }
@@ -420,7 +432,7 @@ function guessChangeInfo(t1, t2, res) {
     while (t1[i] == t2[i]) {
         i += 1;
         if (i == t1.length) {
-            //console.log('insert at tail');
+            // console.log('insert at tail');
             return ['insert', t1.length, t2.length - t1.length];
         } else if (i == t2.length) {
             // console.log('delete at tail');
@@ -453,7 +465,16 @@ function guessChangeInfo(t1, t2, res) {
         }
     } else {
         // console.log('substitude from ' + i + ' to ' + (t1.length-j+1));
-
+        // console.log(t1)
+        // console.log(t2)
+        var k;
+        for (k = i; k < t1.length-j+1; k++) {
+            if (t1[k] == t2[k]) {
+                // console.log(t1[k])
+                unchanged_character_count = unchanged_character_count + 1;
+            }
+        }
+        // console.log(unchanged_character_count);
         if (t2.length <= i + j - 1) {
             IF += (t1.length - t2.length)
             return ['delete', i, i+t1.length-t2.length]
