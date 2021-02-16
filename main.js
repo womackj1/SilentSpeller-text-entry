@@ -254,7 +254,9 @@ $("#Transcribe").keypress(function(){
         } else {
             var distance_probs = [];
             // words.forEach(word => distance_probs.push(Math.pow(string_similarity(word, curr_word),2)));
-            words.forEach(word => distance_probs.push(Math.pow(1/levenshtein(word.slice(0,curr_word.length), curr_word),2)));
+            words.forEach(word => distance_probs.push(1/(levenshtein(word.slice(0,curr_word.length), curr_word)+1)));
+            // words.forEach(word => distance_probs.push(1/(levenshtein(word, curr_word)+1)));
+
 
             // calculate probabilities based on string distance
             var distance_probs_norm = [];
@@ -280,17 +282,23 @@ $("#Transcribe").keypress(function(){
                 if (prev_word.localeCompare("<start>") == 0) {
                     var curr_probability = distance_probs_norm[i];
                 } else {
-                    var curr_probability = transition_probs_norm[i] * distance_probs[i];
+                    var curr_probability = transition_probs_norm[i] * Math.pow(distance_probs_norm[i],2);
+                }
+                if (words[i].localeCompare("east") == 0) {
+                    console.log("Transition: " + transition_probs_norm[i])
+                    console.log("Distance: " + distance_probs_norm[i])
+                    console.log(words[i])
                 }
 
                 if (curr_probability > max_probability &&
                     words[i].localeCompare("<start>") != 0 &&
                     words[i].localeCompare("<end>") != 0) {
-                    // console.log("Transition: " + transition_probs_norm[i])
-                    // console.log("Distance: " + distance_probs_norm[i])
-                    console.log(words[i])
+                    console.log("Transition: " + transition_probs_norm[i])
+                    console.log("Distance: " + distance_probs_norm[i])
+
                     max_probability = curr_probability;
                     closest_word = words[i];
+                    console.log(closest_word)
                 }
             }
         }
@@ -524,8 +532,8 @@ const string_similarity = (a, b) => {
 }
 
 const levenshtein = (a, b) => {
-    console.log(a)
-    console.log(b)
+    // console.log(a)
+    // console.log(b)
     if (a.length === 0) return b.length
     if (b.length === 0) return a.length
     let tmp, i, j, prev, val
@@ -558,7 +566,6 @@ const levenshtein = (a, b) => {
         }
         row[a.length] = prev
     }
-    console.log(row[a.length])
     return row[a.length]
 }
 
