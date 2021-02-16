@@ -343,12 +343,18 @@ $("#Next").click(function() {
     //Update Statisticss
     let time = (ts[ts.length-1].TimeStamp - ts[0].TimeStamp) / 1000, fix_time = 0, delete_time = 0
     let Tlen = ts[ts.length-1].Text.length
+    if (time == 0) {
+        time = 1;
+    }
     let WPM = (Tlen-ts[0].Text.length) / (time/12)
+    console.log(Tlen-ts[0].Text.length)
+    console.log((time/12))
+    console.log(WPM);
     wpms.push(WPM)
     let avg_WPM = wpms.reduce(reducer)/wpms.length
     ters.push(parseFloat(autocorrect_ter))
     let avg_TER = ters.reduce(reducer)/ters.length
-
+        
     $('#Statistics').html("WPM:" + parseInt(WPM, 10) +
         ", avg.WPM:" + parseInt(avg_WPM, 10) +
         ", TER:" + Math.round(parseFloat(autocorrect_ter) * 100) / 100 +
